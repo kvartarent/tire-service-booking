@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Запись на шиномонтаж онлайн. Выберите удобный сервис на карте, дату и время — и забронируйте за минуту.">
+  <title>ШиноСервис — Запись на шиномонтаж онлайн</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛞</text></svg>">
+</head>
+<body>
+
+  <!-- ══ TOP BAR ══ -->
+  <header class="top-bar" id="topBar">
+    <a href="#map" class="logo">
+      <div class="icon">🛞</div>
+      <span>ШиноСервис</span>
+    </a>
+    <button class="back-btn hidden" id="backBtn" onclick="app.goBack()">
+      ← Назад
+    </button>
+  </header>
+
+  <!-- ══ SCREEN: MAP ══ -->
+  <section class="screen active" id="screen-map">
+    <div class="map-container">
+      <div class="css-map" id="mapArea">
+        <!-- Pins will be rendered by JS -->
+      </div>
+      <div class="map-legend">
+        <div class="glass-card">
+          <h3>🗺 Выберите шиномонтаж</h3>
+          <p>Нажмите на метку для записи</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN: SERVICE PAGE ══ -->
+  <section class="screen" id="screen-service">
+    <div class="container">
+      <div class="service-hero glass-card" id="serviceHero">
+        <div class="hero-overlay">
+          <h1 id="serviceName"></h1>
+          <p class="address" id="serviceAddress"></p>
+        </div>
+      </div>
+
+      <div class="service-info-grid" id="serviceInfoGrid">
+        <!-- tiles rendered by JS -->
+      </div>
+
+      <div class="price-table-preview glass-card">
+        <h3 style="margin-bottom:16px">Прайс-лист</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Размер</th>
+              <th>Снятие + установка</th>
+              <th>Балансировка</th>
+              <th>Итого за 1 колесо</th>
+            </tr>
+          </thead>
+          <tbody id="servicePriceBody">
+            <!-- rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cta-section">
+        <h2>Готовы записаться?</h2>
+        <p>Выберите удобную дату и время</p>
+        <button class="btn btn-primary btn-lg" onclick="app.navigate('calendar')">
+          📅 Выбрать дату
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN: CALENDAR ══ -->
+  <section class="screen" id="screen-calendar">
+    <div class="container">
+      <div class="glass-card" style="margin-bottom:24px">
+        <div class="calendar-header">
+          <h2 id="calendarTitle"></h2>
+          <div class="calendar-nav">
+            <button onclick="app.calendarPrev()" id="calPrevBtn">‹</button>
+            <button onclick="app.calendarNext()">›</button>
+          </div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+
+      <div class="time-slots-panel glass-card hidden" id="timeSlotsPanel">
+        <h3>Выберите время</h3>
+        <div class="time-slots-grid" id="timeSlotsGrid">
+          <!-- rendered by JS -->
+        </div>
+        <div style="text-align:center; margin-top:24px">
+          <button class="btn btn-primary" id="continueToFormBtn" onclick="app.navigate('form')" disabled>
+            Продолжить →
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN: BOOKING FORM ══ -->
+  <section class="screen" id="screen-form">
+    <div class="container">
+      <h2 style="margin-bottom:24px">Оформление записи</h2>
+
+      <div class="booking-summary glass-card" id="bookingSummary">
+        <!-- rendered by JS -->
+      </div>
+
+      <div class="glass-card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Ваше имя</label>
+            <input type="text" class="form-input" id="inputName" placeholder="Иван Петров">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Телефон</label>
+            <input type="tel" class="form-input" id="inputPhone" placeholder="+7 (___) ___-__-__">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Размер шин</label>
+            <select class="form-select" id="inputSize" onchange="app.updatePrice()">
+              <option value="">Выберите размер</option>
+              <option value="R13-R14">R13–R14</option>
+              <option value="R15-R16">R15–R16</option>
+              <option value="R17-R18">R17–R18</option>
+              <option value="R19-R20">R19–R20</option>
+              <option value="R21-R22">R21–R22</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Тип шин</label>
+            <select class="form-select" id="inputType">
+              <option value="winter">Зимние</option>
+              <option value="summer">Летние</option>
+              <option value="allseason">Всесезонные</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label class="form-label">Количество колёс</label>
+            <div class="wheel-selector" id="wheelSelector">
+              <div class="wheel-option" data-count="1" onclick="app.selectWheels(1)">
+                <span class="number">1</span>
+                <span class="label">колесо</span>
+              </div>
+              <div class="wheel-option" data-count="2" onclick="app.selectWheels(2)">
+                <span class="number">2</span>
+                <span class="label">колеса</span>
+              </div>
+              <div class="wheel-option selected" data-count="4" onclick="app.selectWheels(4)">
+                <span class="number">4</span>
+                <span class="label">колеса</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align:center; margin-top:24px">
+          <button class="btn btn-primary btn-lg" onclick="app.goToInvoice()">
+            Рассчитать стоимость →
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN: INVOICE ══ -->
+  <section class="screen" id="screen-invoice">
+    <div class="container">
+      <div class="invoice-card glass-card">
+        <h2>💰 Ваш счёт</h2>
+
+        <div id="invoiceDetails">
+          <!-- rendered by JS -->
+        </div>
+
+        <div class="invoice-total">
+          <span>Итого:</span>
+          <span id="invoiceTotal"></span>
+        </div>
+
+        <div class="invoice-advance">
+          <span>Предоплата 50%:</span>
+          <span class="amount" id="invoiceAdvance"></span>
+        </div>
+
+        <button class="btn btn-success btn-block btn-lg" onclick="app.confirmPayment()">
+          💳 Оплатить аванс
+        </button>
+        <p style="text-align:center; margin-top:12px; font-size:0.8rem; color:var(--text-muted)">
+          Оставшиеся 50% оплачиваются при визите
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN: CONFIRMATION ══ -->
+  <section class="screen" id="screen-confirm">
+    <div class="container">
+      <div class="confirm-card glass-card">
+        <div class="confirm-icon">✓</div>
+        <h2>Запись подтверждена!</h2>
+        <p class="subtitle">Вам отправлено подтверждение</p>
+
+        <div class="confirm-details" id="confirmDetails">
+          <!-- rendered by JS -->
+        </div>
+
+        <button class="btn btn-primary btn-lg" onclick="app.navigate('map')" style="margin-top:24px">
+          🗺 Вернуться на карту
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN: ADMIN LOGIN ══ -->
+  <section class="screen" id="screen-admin-login">
+    <div class="login-card glass-card">
+      <h2>🔐 Панель управления</h2>
+      <p class="subtitle">Вход для владельцев сервисов</p>
+      <div class="form-group">
+        <label class="form-label">Логин</label>
+        <input type="text" class="form-input" id="adminLogin" placeholder="admin">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Пароль</label>
+        <input type="password" class="form-input" id="adminPassword" placeholder="••••••">
+      </div>
+      <p class="login-error" id="loginError">Неверный логин или пароль</p>
+      <button class="btn btn-primary btn-block" onclick="app.adminLogin()">Войти</button>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN: ADMIN DASHBOARD ══ -->
+  <section class="screen" id="screen-admin">
+    <div class="container">
+      <div class="admin-header">
+        <h1>📊 Панель управления</h1>
+        <button class="btn btn-secondary btn-sm" onclick="app.adminLogout()">Выйти</button>
+      </div>
+
+      <div class="stats-grid" id="adminStats">
+        <!-- rendered by JS -->
+      </div>
+
+      <div class="admin-tabs" id="adminTabs">
+        <button class="admin-tab active" data-tab="bookings" onclick="app.switchAdminTab('bookings')">Записи</button>
+        <button class="admin-tab" data-tab="pricing" onclick="app.switchAdminTab('pricing')">Прайс-лист</button>
+        <button class="admin-tab" data-tab="schedule" onclick="app.switchAdminTab('schedule')">Расписание</button>
+        <button class="admin-tab" data-tab="locations" onclick="app.switchAdminTab('locations')">Точки</button>
+      </div>
+
+      <!-- Tab: Bookings -->
+      <div class="admin-tab-content glass-card" id="tab-bookings">
+        <div style="overflow-x:auto">
+          <table class="admin-table" id="adminBookingsTable">
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Время</th>
+                <th>Клиент</th>
+                <th>Телефон</th>
+                <th>Размер</th>
+                <th>Колёса</th>
+                <th>Сумма</th>
+                <th>Статус</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="adminBookingsBody">
+              <!-- rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: Pricing -->
+      <div class="admin-tab-content glass-card hidden" id="tab-pricing">
+        <h3 style="margin-bottom:16px">Редактирование прайс-листа</h3>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Размер</th>
+              <th>Снятие + уст. (₽)</th>
+              <th>Балансировка (₽)</th>
+              <th>Итого (₽)</th>
+            </tr>
+          </thead>
+          <tbody id="adminPriceBody">
+            <!-- rendered by JS -->
+          </tbody>
+        </table>
+        <div style="text-align:right; margin-top:16px">
+          <button class="btn btn-primary btn-sm" onclick="app.savePrices()">Сохранить прайс</button>
+        </div>
+      </div>
+
+      <!-- Tab: Schedule -->
+      <div class="admin-tab-content glass-card hidden" id="tab-schedule">
+        <h3 style="margin-bottom:16px">Рабочие часы</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Начало рабочего дня</label>
+            <select class="form-select" id="scheduleStart" onchange="app.saveSchedule()">
+              <option value="7">07:00</option>
+              <option value="8" selected>08:00</option>
+              <option value="9">09:00</option>
+              <option value="10">10:00</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Конец рабочего дня</label>
+            <select class="form-select" id="scheduleEnd" onchange="app.saveSchedule()">
+              <option value="17">17:00</option>
+              <option value="18" selected>18:00</option>
+              <option value="19">19:00</option>
+              <option value="20">20:00</option>
+              <option value="21">21:00</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Длительность слота</label>
+            <select class="form-select" id="scheduleSlot" onchange="app.saveSchedule()">
+              <option value="30">30 минут</option>
+              <option value="60" selected>60 минут</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Выходные дни</label>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px">
+              <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; cursor:pointer">
+                <input type="checkbox" id="dayOff0" onchange="app.saveSchedule()"> Вс
+              </label>
+              <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; cursor:pointer">
+                <input type="checkbox" id="dayOff1" onchange="app.saveSchedule()"> Пн
+              </label>
+              <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; cursor:pointer">
+                <input type="checkbox" id="dayOff2" onchange="app.saveSchedule()"> Вт
+              </label>
+              <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; cursor:pointer">
+                <input type="checkbox" id="dayOff3" onchange="app.saveSchedule()"> Ср
+              </label>
+              <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; cursor:pointer">
+                <input type="checkbox" id="dayOff4" onchange="app.saveSchedule()"> Чт
+              </label>
+              <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; cursor:pointer">
+                <input type="checkbox" id="dayOff5" onchange="app.saveSchedule()"> Пт
+              </label>
+              <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; cursor:pointer">
+                <input type="checkbox" checked id="dayOff6" onchange="app.saveSchedule()"> Сб
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Locations -->
+      <div class="admin-tab-content glass-card hidden" id="tab-locations">
+        <h3 style="margin-bottom:16px">Шиномонтажные точки</h3>
+        <div id="adminLocationsList">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Admin link -->
+  <div style="position:fixed; bottom:16px; right:16px; z-index:100" id="adminLink">
+    <button class="btn btn-secondary btn-sm" onclick="app.navigate('admin-login')" style="opacity:0.5; font-size:0.75rem">
+      ⚙ Админ
+    </button>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
