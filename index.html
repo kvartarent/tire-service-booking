@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Запись на шиномонтаж онлайн. Выберите удобный сервис на карте, дату и время — и забронируйте за минуту.">
+  <meta name="description"
+    content="Запись на шиномонтаж онлайн. Выберите удобный сервис на карте, дату и время — и забронируйте за минуту.">
   <title>ШиноСервис — Запись на шиномонтаж онлайн</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛞</text></svg>">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛞</text></svg>">
 </head>
+
 <body>
 
   <!-- ══ TOP BAR ══ -->
@@ -229,11 +233,11 @@
       <p class="subtitle">Вход для владельцев сервисов</p>
       <div class="form-group">
         <label class="form-label">Логин</label>
-        <input type="text" class="form-input" id="adminLogin" placeholder="admin">
+        <input type="text" class="form-input" id="adminLogin" placeholder="admin" autocomplete="off">
       </div>
       <div class="form-group">
         <label class="form-label">Пароль</label>
-        <input type="password" class="form-input" id="adminPassword" placeholder="••••••">
+        <input type="password" class="form-input" id="adminPassword" placeholder="••••••" autocomplete="new-password">
       </div>
       <p class="login-error" id="loginError">Неверный логин или пароль</p>
       <button class="btn btn-primary btn-block" onclick="app.adminLogin()">Войти</button>
@@ -375,11 +379,13 @@
 
   <!-- Admin link -->
   <div style="position:fixed; bottom:16px; right:16px; z-index:100" id="adminLink">
-    <button class="btn btn-secondary btn-sm" onclick="app.navigate('admin-login')" style="opacity:0.5; font-size:0.75rem">
+    <button class="btn btn-secondary btn-sm" onclick="app.navigate('admin-login')"
+      style="opacity:0.5; font-size:0.75rem">
       ⚙ Админ
     </button>
   </div>
 
   <script src="app.js"></script>
 </body>
+
 </html>

@@ -158,6 +158,16 @@ const app = {
     }
 
     window.scrollTo(0, 0);
+
+    // Сбрасываем поля логина при каждом показе экрана
+    if (name === 'admin-login') {
+      const loginEl = document.getElementById('adminLogin');
+      const passEl = document.getElementById('adminPassword');
+      const errEl = document.getElementById('loginError');
+      if (loginEl) loginEl.value = '';
+      if (passEl) passEl.value = '';
+      if (errEl) errEl.style.display = 'none';
+    }
   },
 
   // ── MAP ──
