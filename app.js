@@ -275,8 +275,8 @@ const app = {
     const month = this.calendarDate.getMonth();
 
     // Title
-    const months = ['Январь','Февраль','Март','Апрель','Май','Июнь',
-                     'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+    const months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
     document.getElementById('calendarTitle').textContent = `${months[month]} ${year}`;
 
     // Disable prev if current month
@@ -293,7 +293,7 @@ const app = {
     grid.innerHTML = '';
 
     // Day names (Mon first)
-    const dayNames = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+    const dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
     dayNames.forEach(d => {
       const el = document.createElement('div');
       el.className = 'day-name';
@@ -367,10 +367,10 @@ const app = {
     const slots = [];
     for (let h = schedule.startHour; h < schedule.endHour; h++) {
       if (schedule.slotMinutes === 30) {
-        slots.push(`${String(h).padStart(2,'0')}:00`);
-        slots.push(`${String(h).padStart(2,'0')}:30`);
+        slots.push(`${String(h).padStart(2, '0')}:00`);
+        slots.push(`${String(h).padStart(2, '0')}:30`);
       } else {
-        slots.push(`${String(h).padStart(2,'0')}:00`);
+        slots.push(`${String(h).padStart(2, '0')}:00`);
       }
     }
     return slots;
@@ -582,7 +582,7 @@ const app = {
       </div>
       <div class="detail-row">
         <span class="label">Шины</span>
-        <span>${booking.size.replace('-','–')} · ${types[booking.type]}</span>
+        <span>${booking.size.replace('-', '–')} · ${types[booking.type]}</span>
       </div>
       <div class="detail-row">
         <span class="label">Колёса</span>
@@ -645,7 +645,10 @@ const app = {
     if (login === 'admin' && password === 'admin123') {
       sessionStorage.setItem('admin_logged_in', 'true');
       document.getElementById('loginError').style.display = 'none';
-      this.navigate('admin');
+      // Показываем панель напрямую, без перенавигации — избегаем гонки хэша
+      this.showScreen('admin');
+      this.renderAdmin();
+      history.replaceState(null, '', location.pathname + '#admin');
     } else {
       document.getElementById('loginError').style.display = 'block';
     }
@@ -705,7 +708,7 @@ const app = {
       return;
     }
 
-    tbody.innerHTML = bookings.sort((a,b) => b.id - a.id).map(b => {
+    tbody.innerHTML = bookings.sort((a, b) => b.id - a.id).map(b => {
       const sizeLabel = b.size.replace('-', '–');
       return `
         <tr>
@@ -829,7 +832,7 @@ const app = {
 
 // ── Screen transition hooks ──
 const origNavigate = app.navigate.bind(app);
-app.navigate = function(screen, pushHistory = true) {
+app.navigate = function (screen, pushHistory = true) {
   origNavigate(screen, pushHistory);
 
   // Hook: when entering calendar, render it
@@ -856,7 +859,7 @@ app.navigate = function(screen, pushHistory = true) {
 document.addEventListener('DOMContentLoaded', () => {
   const phoneInput = document.getElementById('inputPhone');
   if (phoneInput) {
-    phoneInput.addEventListener('input', function(e) {
+    phoneInput.addEventListener('input', function (e) {
       let val = this.value.replace(/\D/g, '');
       if (val.length > 0) {
         if (val[0] === '8') val = '7' + val.slice(1);
