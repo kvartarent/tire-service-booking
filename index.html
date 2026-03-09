@@ -10,7 +10,10 @@
   <link rel="stylesheet" href="style.css">
   <link rel="icon"
     href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛞</text></svg>">
+  <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=4e6a0c5c-7d9a-41bf-a868-b7a4216ee892"
+    type="text/javascript"></script>
 </head>
+
 
 <body>
 
@@ -20,9 +23,15 @@
       <div class="icon">🛞</div>
       <span>ШиноСервис</span>
     </a>
-    <button class="back-btn hidden" id="backBtn" onclick="app.goBack()">
-      ← Назад
-    </button>
+    <div style="display: flex; gap: 12px; align-items: center;">
+      <button class="back-btn hidden" id="backBtn" onclick="app.goBack()">
+        ← Назад
+      </button>
+      <button class="btn btn-secondary btn-sm" id="adminLink" onclick="app.navigate('admin-login')"
+        style="border:none; background:transparent;">
+        ⚙ Админ
+      </button>
+    </div>
   </header>
 
   <!-- ══ SCREEN: MAP ══ -->
@@ -32,9 +41,13 @@
         <!-- Pins will be rendered by JS -->
       </div>
       <div class="map-legend">
-        <div class="glass-card">
+        <div class="glass-card legend-card">
           <h3>🗺 Выберите шиномонтаж</h3>
           <p>Нажмите на метку для записи</p>
+          <div class="search-container" style="margin-top: 16px;">
+            <input type="text" class="form-input" id="searchServiceInput" placeholder="Поиск по названию или адресу..."
+              oninput="app.searchServices()" style="background: rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.2);">
+          </div>
         </div>
       </div>
     </div>
@@ -293,17 +306,19 @@
         <table class="admin-table">
           <thead>
             <tr>
-              <th>Размер</th>
+              <th>Размер / Услуга</th>
               <th>Снятие + уст. (₽)</th>
               <th>Балансировка (₽)</th>
               <th>Итого (₽)</th>
+              <th></th>
             </tr>
           </thead>
           <tbody id="adminPriceBody">
             <!-- rendered by JS -->
           </tbody>
         </table>
-        <div style="text-align:right; margin-top:16px">
+        <div style="display:flex; justify-content:space-between; margin-top:16px">
+          <button class="btn btn-secondary btn-sm" onclick="app.addPriceRow()">+ Добавить услугу</button>
           <button class="btn btn-primary btn-sm" onclick="app.savePrices()">Сохранить прайс</button>
         </div>
       </div>
@@ -334,8 +349,8 @@
           <div class="form-group">
             <label class="form-label">Длительность слота</label>
             <select class="form-select" id="scheduleSlot" onchange="app.saveSchedule()">
-              <option value="30">30 минут</option>
-              <option value="60" selected>60 минут</option>
+              <option value="30" selected>30 минут</option>
+              <option value="60">60 минут</option>
             </select>
           </div>
           <div class="form-group">
@@ -377,13 +392,7 @@
     </div>
   </section>
 
-  <!-- Admin link -->
-  <div style="position:fixed; bottom:16px; right:16px; z-index:100" id="adminLink">
-    <button class="btn btn-secondary btn-sm" onclick="app.navigate('admin-login')"
-      style="opacity:0.5; font-size:0.75rem">
-      ⚙ Админ
-    </button>
-  </div>
+
 
   <script src="app.js"></script>
 </body>

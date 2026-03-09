@@ -47,7 +47,9 @@
 }
 
 /* ── Reset ── */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -77,19 +79,26 @@ body::before {
   width: 200%;
   height: 200%;
   background: radial-gradient(circle at 20% 20%, rgba(108, 99, 255, 0.06) 0%, transparent 50%),
-              radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.04) 0%, transparent 50%);
+    radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.04) 0%, transparent 50%);
   animation: bgShift 20s ease-in-out infinite alternate;
   z-index: 0;
   pointer-events: none;
 }
 
 @keyframes bgShift {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  100% { transform: translate(-5%, -5%) rotate(3deg); }
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  100% {
+    transform: translate(-5%, -5%) rotate(3deg);
+  }
 }
 
 /* ── Utility ── */
-.hidden { display: none !important; }
+.hidden {
+  display: none !important;
+}
 
 .container {
   max-width: 1200px;
@@ -100,15 +109,26 @@ body::before {
 }
 
 /* ── Typography ── */
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
 
-h1 { font-size: 2.5rem; }
-h2 { font-size: 1.75rem; }
-h3 { font-size: 1.25rem; }
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 1.75rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+}
 
 /* ── Glass Card ── */
 .glass-card {
@@ -149,12 +169,14 @@ h3 { font-size: 1.25rem; }
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
   opacity: 0;
   transition: var(--transition);
 }
 
-.btn:hover::after { opacity: 1; }
+.btn:hover::after {
+  opacity: 1;
+}
 
 .btn-primary {
   background: var(--accent-gradient);
@@ -272,8 +294,15 @@ h3 { font-size: 1.25rem; }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Header / Nav ── */
@@ -353,8 +382,8 @@ h3 { font-size: 1.25rem; }
   width: 100%;
   height: 100%;
   background:
-    linear-gradient(rgba(108,99,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(108,99,255,0.03) 1px, transparent 1px),
+    linear-gradient(rgba(108, 99, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108, 99, 255, 0.03) 1px, transparent 1px),
     radial-gradient(ellipse at 30% 40%, rgba(108, 99, 255, 0.08) 0%, transparent 60%),
     radial-gradient(ellipse at 70% 60%, rgba(168, 85, 247, 0.06) 0%, transparent 60%);
   background-size: 60px 60px, 60px 60px, 100% 100%, 100% 100%;
@@ -383,7 +412,7 @@ h3 { font-size: 1.25rem; }
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 15px var(--accent-glow);
-  border: 2px solid rgba(255,255,255,0.2);
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .map-pin .pin-marker span {
@@ -417,20 +446,51 @@ h3 { font-size: 1.25rem; }
   bottom: 24px;
   left: 24px;
   z-index: 30;
+  width: 320px;
+  max-width: calc(100vw - 48px);
 }
 
-.map-legend .glass-card {
-  padding: 16px 20px;
+.map-legend .legend-card {
+  padding: 20px 24px;
+  background: rgba(18, 18, 31, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .map-legend h3 {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   margin-bottom: 8px;
+  color: #fff;
 }
 
 .map-legend p {
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
+  margin-bottom: 0;
+}
+
+.search-container {
+  margin-top: 16px;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.search-container input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
 /* ── SERVICE PAGE ── */
@@ -444,7 +504,7 @@ h3 { font-size: 1.25rem; }
   overflow: hidden;
   margin-bottom: 32px;
   height: 240px;
-  background: linear-gradient(135deg, rgba(108,99,255,0.15), rgba(168,85,247,0.1));
+  background: linear-gradient(135deg, rgba(108, 99, 255, 0.15), rgba(168, 85, 247, 0.1));
   display: flex;
   align-items: flex-end;
 }
@@ -854,8 +914,15 @@ h3 { font-size: 1.25rem; }
 }
 
 @keyframes confirmPop {
-  0% { transform: scale(0); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .confirm-card h2 {
@@ -887,6 +954,9 @@ h3 { font-size: 1.25rem; }
 /* ── ADMIN PANEL ── */
 #screen-admin-login {
   padding-top: 80px;
+}
+
+#screen-admin-login.active {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1060,10 +1130,17 @@ h3 { font-size: 1.25rem; }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-  h1 { font-size: 1.8rem; }
-  h2 { font-size: 1.4rem; }
+  h1 {
+    font-size: 1.8rem;
+  }
 
-  .container { padding: 0 16px; }
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  .container {
+    padding: 0 16px;
+  }
 
   .form-grid {
     grid-template-columns: 1fr;
@@ -1121,13 +1198,22 @@ h3 { font-size: 1.25rem; }
 ::-webkit-scrollbar {
   width: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Yandex Map Styling ── */
+[class*="-ground-pane"] {
+  filter: grayscale(1) opacity(0.7) brightness(1.1);
+  /* Делает карту светло-серой и немного прозрачной */
 }

@@ -17,53 +17,13 @@ const app = {
   services: [
     {
       id: 1,
-      name: 'ШиноМастер',
-      address: 'ул. Ленина, 45',
+      name: 'Bosch Сервис',
+      address: 'Шоссе Революции, 72',
       rating: 4.8,
       reviews: 234,
       hours: '08:00 – 20:00',
-      description: 'Профессиональный шиномонтаж с опытом 10+ лет',
-      pinX: '22%', pinY: '35%'
-    },
-    {
-      id: 2,
-      name: 'КолёсоПлюс',
-      address: 'пр. Мира, 112',
-      rating: 4.6,
-      reviews: 189,
-      hours: '09:00 – 21:00',
-      description: 'Быстрый шиномонтаж, балансировка, ремонт дисков',
-      pinX: '55%', pinY: '28%'
-    },
-    {
-      id: 3,
-      name: 'ТайрСервис',
-      address: 'ул. Гагарина, 78',
-      rating: 4.9,
-      reviews: 312,
-      hours: '07:00 – 19:00',
-      description: 'Премиум-сервис. Только лучшее оборудование.',
-      pinX: '70%', pinY: '55%'
-    },
-    {
-      id: 4,
-      name: 'Шиномонтаж 24',
-      address: 'ул. Победы, 33а',
-      rating: 4.4,
-      reviews: 156,
-      hours: '00:00 – 24:00',
-      description: 'Круглосуточный шиномонтаж. Работаем без выходных.',
-      pinX: '38%', pinY: '65%'
-    },
-    {
-      id: 5,
-      name: 'АвтоШина',
-      address: 'Новый бульвар, 5',
-      rating: 4.7,
-      reviews: 201,
-      hours: '08:00 – 18:00',
-      description: 'Семейный шиномонтаж. Честные цены, быстрая работа.',
-      pinX: '82%', pinY: '40%'
+      description: 'Профессиональный шиномонтаж и балансировка. Современное оборудование.',
+      coords: [59.960881, 30.447786]
     }
   ],
 
@@ -80,7 +40,7 @@ const app = {
   defaultSchedule: {
     startHour: 8,
     endHour: 18,
-    slotMinutes: 60,
+    slotMinutes: 30,
     daysOff: [0] // Sunday
   },
 
@@ -88,6 +48,7 @@ const app = {
   init() {
     this.loadPrices();
     this.loadSchedule();
+    this.updateSizeOptions();
     this.renderMap();
     this.handleHash();
     window.addEventListener('hashchange', () => this.handleHash());
@@ -141,20 +102,19 @@ const app = {
     }
     this.currentScreen = name;
 
-    // Back button visibility
+    // Back button and Admin link visibility
     const backBtn = document.getElementById('backBtn');
+    const adminLink = document.getElementById('adminLink');
     if (name === 'map') {
       backBtn.classList.add('hidden');
+      if (adminLink) adminLink.classList.remove('hidden');
     } else {
       backBtn.classList.remove('hidden');
-    }
-
-    // Admin link visibility
-    const adminLink = document.getElementById('adminLink');
-    if (name.startsWith('admin')) {
-      adminLink.classList.add('hidden');
-    } else {
-      adminLink.classList.remove('hidden');
+      if (name.startsWith('admin')) {
+        if (adminLink) adminLink.classList.add('hidden');
+      } else {
+        if (adminLink) adminLink.classList.remove('hidden');
+      }
     }
 
     window.scrollTo(0, 0);
@@ -172,38 +132,67 @@ const app = {
 
   // ── MAP ──
   renderMap() {
-    const mapArea = document.getElementById('mapArea');
-    // Clear existing pins
-    mapArea.querySelectorAll('.map-pin').forEach(p => p.remove());
+    if (this.mapRendered) return;
+    this.mapRendered = true;
 
-    // Add road lines
-    const roads = document.createElement('div');
-    roads.innerHTML = `
-      <svg style="position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none;opacity:0.08" viewBox="0 0 1000 600" preserveAspectRatio="none">
-        <path d="M0 200 Q 250 180, 500 250 T 1000 200" stroke="#6c63ff" fill="none" stroke-width="3"/>
-        <path d="M0 400 Q 300 380, 600 420 T 1000 350" stroke="#6c63ff" fill="none" stroke-width="2"/>
-        <path d="M200 0 Q 220 200, 180 400 T 250 600" stroke="#6c63ff" fill="none" stroke-width="2"/>
-        <path d="M700 0 Q 680 150, 720 350 T 680 600" stroke="#6c63ff" fill="none" stroke-width="3"/>
-        <path d="M400 0 Q 420 200, 380 350 T 450 600" stroke="#a855f7" fill="none" stroke-width="1.5"/>
-      </svg>
-    `;
-    mapArea.appendChild(roads);
+    // Yandex Maps Initialization
+    if (typeof ymaps === 'undefined') {
+      setTimeout(() => this.renderMap(), 100);
+      return;
+    }
 
-    this.services.forEach(svc => {
-      const pin = document.createElement('div');
-      pin.className = 'map-pin';
-      pin.style.left = svc.pinX;
-      pin.style.top = svc.pinY;
-      pin.innerHTML = `
-        <div class="pin-marker"><span>🛞</span></div>
-        <div class="pin-label">
-          <strong>${svc.name}</strong><br>
-          <span style="color:var(--text-secondary)">${svc.address}</span><br>
-          <span style="color:#f59e0b">★ ${svc.rating}</span> · ${svc.reviews} отз.
-        </div>
-      `;
-      pin.addEventListener('click', () => this.navigate('service/' + svc.id));
-      mapArea.appendChild(pin);
+    ymaps.ready(() => {
+      this.myMap = new ymaps.Map('mapArea', {
+        center: [59.9386, 30.3141],
+        zoom: 10,
+        controls: ['zoomControl', 'geolocationControl']
+      });
+
+      this.placemarks = [];
+
+      this.services.forEach(svc => {
+        const placemark = new ymaps.Placemark(svc.coords, {
+          iconContent: '🛞',
+          balloonContentHeader: `<div style="font-family:Inter,sans-serif;font-weight:700;">${svc.name}</div>`,
+          balloonContentBody: `
+            <div style="font-family:Inter,sans-serif; color:#333; padding:5px 0;">
+              <p style="margin:0 0 5px 0; font-size:13px;">${svc.address}</p>
+              <p style="margin:0 0 10px 0; font-size:12px; color:#f59e0b;">★ ${svc.rating} <span style="color:#666;">(${svc.reviews} отзывов)</span></p>
+              <button onclick="app.navigate('service/${svc.id}')" style="background:#6c63ff; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; width:100%; font-weight:600; font-size:13px;">Выбрать сервис</button>
+            </div>
+          `
+        }, {
+          preset: 'islands#violetIcon'
+        });
+
+        this.placemarks.push({ svc, placemark });
+        this.myMap.geoObjects.add(placemark);
+      });
+
+      if (this.services.length > 1) {
+        this.myMap.setBounds(this.myMap.geoObjects.getBounds(), {
+          checkZoomRange: true,
+          zoomMargin: 40
+        });
+      }
+    });
+  },
+
+  searchServices() {
+    const input = document.getElementById('searchServiceInput');
+    if (!input || !this.placemarks) return;
+
+    const query = input.value.toLowerCase().trim();
+
+    this.placemarks.forEach(item => {
+      const { svc, placemark } = item;
+      const match = svc.name.toLowerCase().includes(query) || svc.address.toLowerCase().includes(query);
+
+      if (match) {
+        placemark.options.set('visible', true);
+      } else {
+        placemark.options.set('visible', false);
+      }
     });
   },
 
@@ -758,30 +747,84 @@ const app = {
     tbody.innerHTML = '';
 
     for (const [size, p] of Object.entries(prices)) {
-      const label = size.replace('-', '–');
       const total = p.removal + p.balance;
       tbody.innerHTML += `
         <tr>
-          <td>${label}</td>
+          <td>
+            <input class="admin-price-name" type="text" data-original="${size}" value="${size}" style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:inherit; width:100%; font-family:inherit; padding: 4px 8px; border-radius: 4px;">
+          </td>
           <td><input class="admin-price-input" type="number" data-size="${size}" data-field="removal" value="${p.removal}"></td>
           <td><input class="admin-price-input" type="number" data-size="${size}" data-field="balance" value="${p.balance}"></td>
           <td><strong>${total.toLocaleString('ru')} ₽</strong></td>
+          <td><button class="btn btn-sm" style="background:rgba(239, 68, 68, 0.2); color:#ef4444; padding:4px 8px; border:none;" onclick="app.deletePriceRow('${size}')">✕</button></td>
         </tr>
       `;
     }
   },
 
   savePrices() {
-    const prices = this.getPrices();
-    document.querySelectorAll('.admin-price-input').forEach(input => {
-      const size = input.dataset.size;
-      const field = input.dataset.field;
-      prices[size][field] = parseInt(input.value) || 0;
+    const newPrices = {};
+    const rows = document.querySelectorAll('#adminPriceBody tr');
+
+    rows.forEach(row => {
+      const nameInput = row.querySelector('.admin-price-name');
+      const inputs = row.querySelectorAll('.admin-price-input');
+      if (nameInput && inputs.length === 2) {
+        let sizeName = nameInput.value.trim() || nameInput.dataset.original;
+        // prevent empty string or duplicate key clobbering by appending spaces if necessary
+        while (newPrices[sizeName]) sizeName += ' ';
+        newPrices[sizeName] = {
+          removal: parseInt(inputs[0].value) || 0,
+          balance: parseInt(inputs[1].value) || 0
+        };
+      }
     });
-    localStorage.setItem('tire_prices', JSON.stringify(prices));
+
+    localStorage.setItem('tire_prices', JSON.stringify(newPrices));
+    this.updateSizeOptions();
     this.renderAdminPricing();
     this.renderServicePriceTable();
     alert('Прайс-лист сохранён!');
+  },
+
+  addPriceRow() {
+    const name = prompt('Введите название новой услуги или размера (например, Хранение шин):');
+    if (!name) return;
+
+    const prices = this.getPrices();
+    if (prices[name]) {
+      alert('Такая услуга уже существует!');
+      return;
+    }
+
+    prices[name] = { removal: 0, balance: 0 };
+    localStorage.setItem('tire_prices', JSON.stringify(prices));
+    this.renderAdminPricing();
+  },
+
+  deletePriceRow(name) {
+    if (!confirm(`Удалить услугу "${name}"?`)) return;
+    const prices = this.getPrices();
+    delete prices[name];
+    localStorage.setItem('tire_prices', JSON.stringify(prices));
+    this.renderAdminPricing();
+  },
+
+  updateSizeOptions() {
+    const select = document.getElementById('inputSize');
+    if (!select) return;
+    const currentVal = select.value;
+    const prices = this.getPrices();
+
+    select.innerHTML = '<option value="">Выберите размер / услугу</option>';
+    for (const size of Object.keys(prices)) {
+      const label = size.replace('-', '–');
+      const option = document.createElement('option');
+      option.value = size;
+      option.textContent = label;
+      select.appendChild(option);
+    }
+    select.value = currentVal;
   },
 
   renderAdminSchedule() {
